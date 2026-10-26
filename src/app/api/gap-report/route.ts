@@ -23,8 +23,14 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    if (!authContext.user) {
+      return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
+    }
+
+    const currentUser = authContext.user;
+
     if (authContext.supabase) {
-      const userId = authContext.user.id;
+      const userId = currentUser.id;
       // Fetch authenticated student's materials
       const { data: materialsData } = await authContext.supabase
         .from('materials')

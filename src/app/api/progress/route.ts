@@ -44,8 +44,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, ...demoData });
     }
 
+    if (!authContext.user) {
+      return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
+    }
+
+    const currentUser = authContext.user;
+    const userId = currentUser.id;
+
     if (authContext.supabase) {
-      const userId = authContext.user.id;
 
       // 1. Fetch attempts
       const { data: attempts } = await authContext.supabase
@@ -111,7 +117,7 @@ export async function GET(req: NextRequest) {
 
     // Default empty live state
     const emptyData = {
-      studentId: authContext.user.id,
+      studentId: userId,
       isDemo: false,
       generatedAt: new Date().toISOString(),
       summary: {

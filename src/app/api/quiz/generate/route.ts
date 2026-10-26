@@ -94,10 +94,11 @@ export async function POST(req: NextRequest) {
     storeQuizQuestions(generatedQuestions);
 
     // If Supabase is available, persist questions for persistent server grading
-    if (authContext.supabase) {
+    if (authContext.supabase && authContext.user) {
+      const currentUserId = authContext.user.id;
       try {
         const rows = generatedQuestions.map((q) => ({
-          user_id: authContext.user.id,
+          user_id: currentUserId,
           topic_name: q.topicName,
           question: q.question,
           options: q.options,

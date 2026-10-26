@@ -88,8 +88,9 @@ export async function POST(req: NextRequest) {
       // JSON payload: either storagePath from Supabase Storage or pasted notes
       const body = await req.json();
 
-      if (body.storagePath) {
-        storagePath = body.storagePath;
+      if (body.storagePath && typeof body.storagePath === 'string') {
+        const targetStoragePath: string = body.storagePath;
+        storagePath = targetStoragePath;
         fileName = body.fileName || 'document.pdf';
         fileSize = body.fileSize || 0;
         title = body.title?.trim() || fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
 
         const { data: fileBlob, error: downloadErr } = await authContext.supabase.storage
           .from('study-materials')
-          .download(storagePath);
+          .download(targetStoragePath);
 
         if (downloadErr || !fileBlob) {
           return NextResponse.json(
